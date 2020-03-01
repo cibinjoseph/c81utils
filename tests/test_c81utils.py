@@ -52,7 +52,7 @@ class CoeffTableTestBad(unittest.TestCase):
     def test_checkdim(self):
         self.assertRaises(ValueError, self.cl.checkdim, 'cl')
 
-class C81testGood(unittest.TestCase):
+class C81TestGood(unittest.TestCase):
 
     def setUp(self):
         self.npl = c81utils.C81(testdit + 'sample1.C81')
