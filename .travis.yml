@@ -1,7 +1,7 @@
 language: python
 dist: xenial
 
-before_install:
+install:
   - python --version
   - pip install -U numpy
 
