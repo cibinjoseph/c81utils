@@ -119,9 +119,7 @@ class C81:
         nalpha_m = int(header[40:42])
 
         # LIFT
-        multilinedata = False
-        if nmach_l >= 9:
-            multilinedata = True
+        multilinedata = nmach_l >= 9
         # Read mach values
         mach_l = f.readline().rstrip()
         if multilinedata:
@@ -139,9 +137,7 @@ class C81:
             cl = cl + [line[1:]]
 
         # DRAG
-        multilinedata = False
-        if nmach_d >= 9:
-            multilinedata = True
+        multilinedata = nmach_d >= 9
         # Read mach values
         mach_d = f.readline().rstrip()
         if multilinedata:
@@ -159,9 +155,7 @@ class C81:
             cd = cd + [line[1:]]
 
         # MOMENT
-        multilinedata = False
-        if nmach_m >= 9:
-            multilinedata = True
+        multilinedata = nmach_m >= 9
         # Read mach values
         mach_m = f.readline().rstrip()
         if multilinedata:
