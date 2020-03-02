@@ -55,6 +55,12 @@ class C81:
             strout = 'Uninitialized C81 class'
         return strout
 
+    def __eq__(self, other):
+        ret = [self.cl.mach.tolist() == other.cl.mach.tolist()]
+        ret.append(self.cl.alpha.tolist() == other.cl.alpha.tolist())
+        ret.append(self.cl.val.tolist() == other.cl.val.tolist())
+        return all(ret)
+
     @staticmethod
     def _checkdatatype(airfoilname, **kwargs):
         """
