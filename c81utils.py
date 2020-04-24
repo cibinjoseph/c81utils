@@ -4,13 +4,13 @@ from scipy.interpolate import RectBivariateSpline
 
 class CoeffTable:
     """ CoeffTable class for aerodynamic coefficients """
-    mach = np.array([])
     alpha = np.array([])
+    mach = np.array([])
     val = np.array([])
 
-    def __init__(self, mach, alpha, val):
-        self.mach = mach
+    def __init__(self, alpha, mach, val):
         self.alpha = alpha
+        self.mach = mach
         self.val = val
 
     def checkdim(self, coeffname):
@@ -49,8 +49,9 @@ class C81:
         return strout
 
     def __eq__(self, other):
-        ret = [self.cl.mach.tolist() == other.cl.mach.tolist()]
-        ret.append(self.cl.alpha.tolist() == other.cl.alpha.tolist())
+        ret = []
+        ret.append([self.cl.alpha.tolist() == other.cl.alpha.tolist()])
+        ret.append([self.cl.mach.tolist() == other.cl.mach.tolist()])
         ret.append(self.cl.val.tolist() == other.cl.val.tolist())
         return all(ret)
 
@@ -74,18 +75,21 @@ class C81:
         if not isinstance(airfoilname, str):
             raise TypeError('The input argument airfoilname is of incorrect data type')
 
-    def setValues(self, airfoilname, mach_l, alpha_l, cl, mach_d, alpha_d, cd, mach_m, alpha_m, cm):
+    def setValues(self, airfoilname, \
+                  alpha_l, mach_l, cl, \
+                  alpha_d, mach_d, cd,
+                  alpha_m, mach_m, cm):
         """ Input airfoil data into C81 class variables as arguments """
         self._checkdatatype(airfoilname,
-                            mach_l=mach_l, alpha_l=alpha_l, cl=cl,
-                            mach_d=mach_d, alpha_d=alpha_d, cd=cd,
-                            mach_m=mach_m, alpha_m=alpha_m, cm=cm)
+                            alpha_l=alpha_l, mach_l=mach_l, cl=cl,
+                            alpha_d=alpha_d, mach_d=mach_d, cd=cd,
+                            alpha_m=alpha_m, mach_m=mach_m, cm=cm)
 
         self.isEmpty = False
         self.airfoilname = airfoilname
-        self.cl = CoeffTable(np.array(mach_l), np.array(alpha_l), np.array(cl))
-        self.cd = CoeffTable(np.array(mach_d), np.array(alpha_d), np.array(cd))
-        self.cm = CoeffTable(np.array(mach_m), np.array(alpha_m), np.array(cm))
+        self.cl = CoeffTable(np.array(alpha_l), np.array(mach_l), np.array(cl))
+        self.cd = CoeffTable(np.array(alpha_d), np.array(mach_d), np.array(cd))
+        self.cm = CoeffTable(np.array(alpha_m), np.array(mach_m), np.array(cm))
 
         self.cl.checkdim('CL')
         self.cd.checkdim('CD')
@@ -159,24 +163,24 @@ class C81:
         f.close()
 
         self.setValues(airfoilname, \
-                       mach_l, alpha_l, cl, \
-                       mach_d, alpha_d, cd, \
-                       mach_m, alpha_m, cm)
+                       alpha_l, mach_l, cl, \
+                       alpha_d, mach_d, cd, \
+                       alpha_m, mach_m, cm)
 
-    def getCL(self, machQuery, alphaQuery):
+    def getCL(self, alphaQuery, machQuery):
         """ Returns bilinearly interpolated CL value """
-        machQuery = np.array(machQuery)
         alphaQuery = np.array(alphaQuery)
+        machQuery = np.array(machQuery)
 
         if alphaQuery.shape != machQuery.shape:
             raise ValueError('Shapes of alphaQuery and machQuery do not match')
 
-        machQuery = np.clip(machQuery, \
-                             min(self.cl.mach), \
-                             max(self.cl.mach))
         alphaQuery = np.clip(alphaQuery, \
                              min(self.cl.alpha), \
                              max(self.cl.alpha))
+        machQuery = np.clip(machQuery, \
+                             min(self.cl.mach), \
+                             max(self.cl.mach))
 
         print(self.cl.val.shape)
         print(self.cl.alpha.size)
@@ -193,6 +197,6 @@ a = [0, 2, 8, 10]    # rows
 m = [0.0, 0.5, 1.0]  # columns
 c = [[0, 0.1, 0.2], [0.2, 0.3, 0.4], [0.8, 0.9, 1.0], [1.0, 1.1, 1.2]]
 
-naca.setValues('NACA 0012', m, a, c, m, a, c, m, a, c)
+naca.setValues('NACA 0012', a, m, c, a, m, c, a, m, c)
 # naca.readfile('sample1.C81')
 print(naca.getCL(8, 0.5))
