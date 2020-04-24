@@ -1,5 +1,6 @@
 __pycache__/
 tests/__pycache__/
 *.so
+*.pyc
 tests/*.so
 trial.py
