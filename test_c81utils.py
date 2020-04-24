@@ -53,7 +53,7 @@ class CoeffTableTestBad(unittest.TestCase):
     def test_checkdim(self):
         self.assertRaises(ValueError, self.cl.checkdim, 'cl')
 
-class C81TestGood(unittest.TestCase):
+class C81FileTestGood(unittest.TestCase):
 
     def setUp(self):
         with open(testdir + 'sample1.C81') as f:
@@ -114,6 +114,75 @@ class C81TestGood(unittest.TestCase):
             self.npl2 = c81utils.load(f)
         self.assertTrue(self.npl == self.npl2)
 
+class C81InputTestGood(unittest.TestCase):
+
+    def setUp(self):
+        alpha = [0, 2, 8, 10]
+        mach = [0, 0.5, 1]
+        coeff = [[0.0, 0.1, 0.2], \
+                      [0.2, 0.3, 0.4], \
+                      [0.8, 0.9, 1.0], \
+                      [1.0, 1.1, 1.2]]
+        self.airfoil = c81utils.C81('NACA XXXX', \
+                                    alpha, mach, coeff, \
+                                    alpha, mach, coeff, \
+                                    alpha, mach, coeff)
+
+    def test_singleCoeffs(self):
+        # Present values
+        CL = self.airfoil.getCL(2, 0.5)
+        CD = self.airfoil.getCD(2, 0.5)
+        CM = self.airfoil.getCM(2, 0.5)
+        self.assertEqual(CL, 0.3)
+        self.assertEqual(CL, 0.3)
+        self.assertEqual(CL, 0.3)
+        CL = self.airfoil.getCL(2, 0.0)
+        CD = self.airfoil.getCD(2, 0.0)
+        CM = self.airfoil.getCM(2, 0.0)
+        self.assertEqual(CL, 0.2)
+        self.assertEqual(CD, 0.2)
+        self.assertEqual(CM, 0.2)
+        # Above limits
+        CL = self.airfoil.getCL(8, 1.5)
+        CD = self.airfoil.getCD(8, 1.5)
+        CM = self.airfoil.getCM(8, 1.5)
+        self.assertEqual(CL, 1.0)
+        self.assertEqual(CD, 1.0)
+        self.assertEqual(CM, 1.0)
+        CL = self.airfoil.getCL(16, 0.5)
+        CD = self.airfoil.getCD(16, 0.5)
+        CM = self.airfoil.getCM(16, 0.5)
+        self.assertEqual(CL, 1.1)
+        self.assertEqual(CD, 1.1)
+        self.assertEqual(CM, 1.1)
+        # Below limits
+        CL = self.airfoil.getCL(-1, 0.5)
+        CD = self.airfoil.getCD(-1, 0.5)
+        CM = self.airfoil.getCM(-1, 0.5)
+        self.assertEqual(CL, 0.1)
+        self.assertEqual(CD, 0.1)
+        self.assertEqual(CM, 0.1)
+        # 2d interpolated
+        CL = self.airfoil.getCL(1, 0.25)
+        CD = self.airfoil.getCD(1, 0.25)
+        CM = self.airfoil.getCM(1, 0.25)
+        self.assertAlmostEqual(CL, 0.15, places=12)
+        self.assertAlmostEqual(CD, 0.15, places=12)
+        self.assertAlmostEqual(CM, 0.15, places=12)
+
+    def test_arrayCoeffs(self):
+        alphas = [2, 2, 8, 16, -1, 1]
+        machs = [0.5, 0.0, 1.5, 0.5, 0.5, 0.25]
+        CL = list(map(self.airfoil.getCL, alphas, machs))
+        CD = list(map(self.airfoil.getCL, alphas, machs))
+        CM = list(map(self.airfoil.getCL, alphas, machs))
+        correct = [0.3, 0.2, 1.0, 1.1, 0.1, 0.15]
+        for indx, val in enumerate(CL):
+            self.assertAlmostEqual(val, correct[indx], places=12)
+        for indx, val in enumerate(CD):
+            self.assertAlmostEqual(val, correct[indx], places=12)
+        for indx, val in enumerate(CM):
+            self.assertAlmostEqual(val, correct[indx], places=12)
 
 
 if __name__ == '__main__':
