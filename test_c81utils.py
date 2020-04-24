@@ -56,7 +56,8 @@ class CoeffTableTestBad(unittest.TestCase):
 class C81TestGood(unittest.TestCase):
 
     def setUp(self):
-        self.npl = c81utils.C81(testdir + 'sample1.C81')
+        with open(testdir + 'sample1.C81') as f:
+            self.npl = c81utils.load(f)
 
         # Lift
         f = open(testdir + 'sample1_CL.csv', 'r')
@@ -109,7 +110,8 @@ class C81TestGood(unittest.TestCase):
         self.assertListEqual(self.npl.cl.val.tolist(), self.val_l)
 
     def test_eq(self):
-        self.npl2 = c81utils.C81(testdir + 'sample1.C81')
+        with open(testdir + 'sample1.C81') as f:
+            self.npl2 = c81utils.load(f)
         self.assertTrue(self.npl == self.npl2)
 
 
