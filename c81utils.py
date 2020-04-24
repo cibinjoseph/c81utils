@@ -151,7 +151,7 @@ def load(fileObject):
     alpha_d = []
     cd = []
     for i in range(nalpha_d):
-        line = f.readline().rstrip()
+        line = fileObject.readline().rstrip()
         if multilinedata:
             line = line + fileObject.readline().rstrip()
         line = list(map(float, line.split()))
