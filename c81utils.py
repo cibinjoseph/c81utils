@@ -74,7 +74,7 @@ class C81:
         if not isinstance(airfoilname, str):
             raise TypeError('The input argument airfoilname is of incorrect data type')
 
-    def input(self, airfoilname, mach_l, alpha_l, cl, mach_d, alpha_d, cd, mach_m, alpha_m, cm):
+    def setValues(self, airfoilname, mach_l, alpha_l, cl, mach_d, alpha_d, cd, mach_m, alpha_m, cm):
         """ Input airfoil data into C81 class variables as arguments """
         self._checkdatatype(airfoilname,
                             mach_l=mach_l, alpha_l=alpha_l, cl=cl,
@@ -158,13 +158,41 @@ class C81:
             cm = cm + [line[1:]]
         f.close()
 
-        self.input(airfoilname, mach_l, alpha_l, cl, mach_d, alpha_d, cd, mach_m, alpha_m, cm)
+        self.setValues(airfoilname, \
+                       mach_l, alpha_l, cl, \
+                       mach_d, alpha_d, cd, \
+                       mach_m, alpha_m, cm)
+
+    def getCL(self, machQuery, alphaQuery):
+        """ Returns bilinearly interpolated CL value """
+        machQuery = np.array(machQuery)
+        alphaQuery = np.array(alphaQuery)
+
+        if alphaQuery.shape != machQuery.shape:
+            raise ValueError('Shapes of alphaQuery and machQuery do not match')
+
+        machQuery = np.clip(machQuery, \
+                             min(self.cl.mach), \
+                             max(self.cl.mach))
+        alphaQuery = np.clip(alphaQuery, \
+                             min(self.cl.alpha), \
+                             max(self.cl.alpha))
+
+        print(self.cl.val.shape)
+        print(self.cl.alpha.size)
+        print(self.cl.mach.size)
+        CL = RectBivariateSpline(self.cl.alpha, self.cl.mach, self.cl.val, \
+                                  kx=1, ky=1)
+
+        return CL(alphaQuery, machQuery)
+
+
 
 naca = C81()  # Initialize C81 object
-a = [10, 20]
-m = [0.0, 1.0]
-c = [[0.0, 1.0], [0.5, 1.5]]
+a = [0, 2, 8, 10]    # rows
+m = [0.0, 0.5, 1.0]  # columns
+c = [[0, 0.1, 0.2], [0.2, 0.3, 0.4], [0.8, 0.9, 1.0], [1.0, 1.1, 1.2]]
 
-# naca.input('NACA 0012', a, m, c, a, m, c, a, m, c)
-# print(naca)
-naca.readfile('sample1.C81')
+naca.setValues('NACA 0012', m, a, c, m, a, c, m, a, c)
+# naca.readfile('sample1.C81')
+print(naca.getCL(8, 0.5))
