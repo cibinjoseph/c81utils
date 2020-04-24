@@ -20,12 +20,12 @@ class CoeffTableTestGood(unittest.TestCase):
         self.alpha = np.array(self.alpha)
         self.val = np.array(self.val)
 
-        self.cl = c81utils.CoeffTable(self.alpha, self.mach, self.val)
+        self.CL = c81utils.CoeffTable(self.alpha, self.mach, self.val)
 
     def test_init(self):
-        self.assertListEqual(self.cl.alpha.tolist(), self.alpha.tolist())
-        self.assertListEqual(self.cl.mach.tolist(), self.mach.tolist())
-        self.assertListEqual(self.cl.val.tolist(), self.val.tolist())
+        self.assertListEqual(self.CL.alpha.tolist(), self.alpha.tolist())
+        self.assertListEqual(self.CL.mach.tolist(), self.mach.tolist())
+        self.assertListEqual(self.CL.val.tolist(), self.val.tolist())
 
 
 class CoeffTableTestBad(unittest.TestCase):
@@ -43,15 +43,15 @@ class CoeffTableTestBad(unittest.TestCase):
         self.alpha = np.array(self.alpha)
         self.val = np.array(self.val)
 
-        self.cl = c81utils.CoeffTable(self.alpha, self.mach, self.val)
+        self.CL = c81utils.CoeffTable(self.alpha, self.mach, self.val)
 
     def test_init(self):
-        self.assertListEqual(self.cl.alpha.tolist(), self.alpha.tolist())
-        self.assertListEqual(self.cl.mach.tolist(), self.mach.tolist())
-        self.assertListEqual(self.cl.val.tolist(), self.val.tolist())
+        self.assertListEqual(self.CL.alpha.tolist(), self.alpha.tolist())
+        self.assertListEqual(self.CL.mach.tolist(), self.mach.tolist())
+        self.assertListEqual(self.CL.val.tolist(), self.val.tolist())
 
     def test_checkdim(self):
-        self.assertRaises(ValueError, self.cl.checkdim, 'cl')
+        self.assertRaises(ValueError, self.CL.checkdim, 'CL')
 
 class C81FileTestGood(unittest.TestCase):
 
@@ -66,13 +66,13 @@ class C81FileTestGood(unittest.TestCase):
 
         self.mach_l = self.val_l.pop(0)
         del self.mach_l[0]
-        self.alpha_l = [i[0] for i in self.val_l]
-        for i in range(len(self.alpha_l)):
+        self.alpha_L = [i[0] for i in self.val_l]
+        for i in range(len(self.alpha_L)):
             del self.val_l[i][0]
             self.val_l[i] = list(map(float, self.val_l[i]))
 
         self.mach_l = list(map(float, self.mach_l))
-        self.alpha_l = list(map(float, self.alpha_l))
+        self.alpha_L = list(map(float, self.alpha_L))
 
         # Drag
         f = open(testdir + 'sample1_CD.csv', 'r')
@@ -81,13 +81,13 @@ class C81FileTestGood(unittest.TestCase):
 
         self.mach_d = self.val_d.pop(0)
         del self.mach_d[0]
-        self.alpha_d = [i[0] for i in self.val_d]
-        for i in range(len(self.alpha_d)):
+        self.alpha_D = [i[0] for i in self.val_d]
+        for i in range(len(self.alpha_D)):
             del self.val_d[i][0]
             self.val_d[i] = list(map(float, self.val_d[i]))
 
         self.mach_d = list(map(float, self.mach_d))
-        self.alpha_d = list(map(float, self.alpha_d))
+        self.alpha_D = list(map(float, self.alpha_D))
 
         # Moment
         f = open(testdir + 'sample1_CM.csv', 'r')
@@ -96,23 +96,32 @@ class C81FileTestGood(unittest.TestCase):
 
         self.mach_m = self.val_m.pop(0)
         del self.mach_m[0]
-        self.alpha_m = [i[0] for i in self.val_m]
-        for i in range(len(self.alpha_m)):
+        self.alpha_M = [i[0] for i in self.val_m]
+        for i in range(len(self.alpha_M)):
             del self.val_m[i][0]
             self.val_m[i] = list(map(float, self.val_m[i]))
 
         self.mach_m = list(map(float, self.mach_m))
-        self.alpha_m = list(map(float, self.alpha_m))
+        self.alpha_M = list(map(float, self.alpha_M))
 
     def test_init(self):
-        self.assertListEqual(self.npl.cl.alpha.tolist(), self.alpha_l)
-        self.assertListEqual(self.npl.cl.mach.tolist(), self.mach_l)
-        self.assertListEqual(self.npl.cl.val.tolist(), self.val_l)
+        self.assertListEqual(self.npl.CL.alpha.tolist(), self.alpha_L)
+        self.assertListEqual(self.npl.CL.mach.tolist(), self.mach_l)
+        self.assertListEqual(self.npl.CL.val.tolist(), self.val_l)
+
+        self.assertListEqual(self.npl.CD.alpha.tolist(), self.alpha_D)
+        self.assertListEqual(self.npl.CD.mach.tolist(), self.mach_d)
+        self.assertListEqual(self.npl.CD.val.tolist(), self.val_d)
+
+        self.assertListEqual(self.npl.CM.alpha.tolist(), self.alpha_M)
+        self.assertListEqual(self.npl.CM.mach.tolist(), self.mach_m)
+        self.assertListEqual(self.npl.CM.val.tolist(), self.val_m)
 
     def test_eq(self):
         with open(testdir + 'sample1.C81') as f:
             self.npl2 = c81utils.load(f)
         self.assertTrue(self.npl == self.npl2)
+
 
 class C81InputTestGood(unittest.TestCase):
 
@@ -120,9 +129,9 @@ class C81InputTestGood(unittest.TestCase):
         alpha = [0, 2, 8, 10]
         mach = [0, 0.5, 1]
         coeff = [[0.0, 0.1, 0.2], \
-                      [0.2, 0.3, 0.4], \
-                      [0.8, 0.9, 1.0], \
-                      [1.0, 1.1, 1.2]]
+                 [0.2, 0.3, 0.4], \
+                 [0.8, 0.9, 1.0], \
+                 [1.0, 1.1, 1.2]]
         self.airfoil = c81utils.C81('NACA XXXX', \
                                     alpha, mach, coeff, \
                                     alpha, mach, coeff, \
