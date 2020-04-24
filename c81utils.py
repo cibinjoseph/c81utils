@@ -4,6 +4,7 @@ from scipy.interpolate import RectBivariateSpline
 
 class CoeffTable:
     """ CoeffTable class for aerodynamic coefficients """
+
     alpha = np.array([])
     mach = np.array([])
     val = np.array([])
@@ -31,6 +32,7 @@ class CoeffTable:
 
 class C81:
     """ C81 class for c81 formatted airfoil tables """
+
     isEmpty = True
 
     def __init__(self, airfoilname, \
@@ -180,17 +182,3 @@ def load(fileObject):
                 alpha_l, mach_l, cl, \
                 alpha_d, mach_d, cd, \
                 alpha_m, mach_m, cm)
-
-
-a = [0, 2, 8, 10]    # rows
-m = [0.0, 0.5, 1.0]  # columns
-c = [[0, 0.1, 0.2], [0.2, 0.3, 0.4], [0.8, 0.9, 1.0], [1.0, 1.1, 1.2]]
-
-naca = C81('NACA 0012', a, m, c, a, m, c, a, m, c)
-print(naca.getCL(2, 2.0))
-# aQ = np.array([0, 2, 10, 8])
-# mQ = np.array([0, 0.5, 1, 0])
-
-# f = open('sample1.C81')
-# naca = load(f)
-# f.close()
