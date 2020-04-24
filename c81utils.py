@@ -1,13 +1,9 @@
 import numpy as np
-
-
-# from scipy import interpolate
+from scipy.interpolate import RectBivariateSpline
 
 
 class CoeffTable:
-    """
-    CoeffTable class for aerodynamic coefficients
-    """
+    """ CoeffTable class for aerodynamic coefficients """
     mach = np.array([])
     alpha = np.array([])
     val = np.array([])
@@ -33,11 +29,8 @@ class CoeffTable:
         elif self.val.shape[1] != cols:
             raise ValueError('Inconsistent no. of mach and ' + coeffname + ' coefficient values')
 
-
 class C81:
-    """
-    C81 class for c81 formatted airfoil tables
-    """
+    """ C81 class for c81 formatted airfoil tables """
     isEmpty = True
 
     def __init__(self, filename=False):
@@ -81,14 +74,6 @@ class C81:
         if not isinstance(airfoilname, str):
             raise TypeError('The input argument airfoilname is of incorrect data type')
 
-    @staticmethod
-    def _toarray(li):
-        """ Returns np.array when a list or np.array is provided as input """
-        if isinstance(li, list):
-            return np.array(li)
-        else:
-            return li
-
     def input(self, airfoilname, mach_l, alpha_l, cl, mach_d, alpha_d, cd, mach_m, alpha_m, cm):
         """ Input airfoil data into C81 class variables as arguments """
         self._checkdatatype(airfoilname,
@@ -98,9 +83,9 @@ class C81:
 
         self.isEmpty = False
         self.airfoilname = airfoilname
-        self.cl = CoeffTable(self._toarray(mach_l), self._toarray(alpha_l), self._toarray(cl))
-        self.cd = CoeffTable(self._toarray(mach_d), self._toarray(alpha_d), self._toarray(cd))
-        self.cm = CoeffTable(self._toarray(mach_m), self._toarray(alpha_m), self._toarray(cm))
+        self.cl = CoeffTable(np.array(mach_l), np.array(alpha_l), np.array(cl))
+        self.cd = CoeffTable(np.array(mach_d), np.array(alpha_d), np.array(cd))
+        self.cm = CoeffTable(np.array(mach_m), np.array(alpha_m), np.array(cm))
 
         self.cl.checkdim('CL')
         self.cd.checkdim('CD')
@@ -174,7 +159,6 @@ class C81:
         f.close()
 
         self.input(airfoilname, mach_l, alpha_l, cl, mach_d, alpha_d, cd, mach_m, alpha_m, cm)
-
 
 naca = C81()  # Initialize C81 object
 a = [10, 20]
