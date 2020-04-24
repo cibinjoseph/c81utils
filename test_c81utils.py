@@ -20,11 +20,11 @@ class CoeffTableTestGood(unittest.TestCase):
         self.alpha = np.array(self.alpha)
         self.val = np.array(self.val)
 
-        self.cl = c81utils.CoeffTable(self.mach, self.alpha, self.val)
+        self.cl = c81utils.CoeffTable(self.alpha, self.mach, self.val)
 
     def test_init(self):
-        self.assertListEqual(self.cl.mach.tolist(), self.mach.tolist())
         self.assertListEqual(self.cl.alpha.tolist(), self.alpha.tolist())
+        self.assertListEqual(self.cl.mach.tolist(), self.mach.tolist())
         self.assertListEqual(self.cl.val.tolist(), self.val.tolist())
 
 
@@ -43,11 +43,11 @@ class CoeffTableTestBad(unittest.TestCase):
         self.alpha = np.array(self.alpha)
         self.val = np.array(self.val)
 
-        self.cl = c81utils.CoeffTable(self.mach, self.alpha, self.val)
+        self.cl = c81utils.CoeffTable(self.alpha, self.mach, self.val)
 
     def test_init(self):
-        self.assertListEqual(self.cl.mach.tolist(), self.mach.tolist())
         self.assertListEqual(self.cl.alpha.tolist(), self.alpha.tolist())
+        self.assertListEqual(self.cl.mach.tolist(), self.mach.tolist())
         self.assertListEqual(self.cl.val.tolist(), self.val.tolist())
 
     def test_checkdim(self):
@@ -104,10 +104,10 @@ class C81TestGood(unittest.TestCase):
         self.alpha_m = list(map(float, self.alpha_m))
 
     def test_init(self):
-        self.assertListEqual(self.npl.cl.mach.tolist(), self.mach_l)
         self.assertListEqual(self.npl.cl.alpha.tolist(), self.alpha_l)
+        self.assertListEqual(self.npl.cl.mach.tolist(), self.mach_l)
         self.assertListEqual(self.npl.cl.val.tolist(), self.val_l)
-        
+
     def test_eq(self):
         self.npl2 = c81utils.C81(testdir + 'sample1.C81')
         self.assertTrue(self.npl == self.npl2)
