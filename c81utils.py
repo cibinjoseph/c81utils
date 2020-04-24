@@ -33,9 +33,33 @@ class C81:
     """ C81 class for c81 formatted airfoil tables """
     isEmpty = True
 
-    def __init__(self, filename=False):
-        if filename:
-            self.readfile(filename)
+    def __init__(self, airfoilname, \
+                 alpha_l, mach_l, cl, \
+                 alpha_d, mach_d, cd, \
+                 alpha_m, mach_m, cm):
+
+        self._checkdatatype(airfoilname, \
+                            alpha_l=alpha_l, mach_l=mach_l, cl=cl,
+                            alpha_d=alpha_d, mach_d=mach_d, cd=cd,
+                            alpha_m=alpha_m, mach_m=mach_m, cm=cm)
+
+        self.isEmpty = False
+        self.airfoilname = airfoilname
+        self.cl = CoeffTable(np.array(alpha_l), np.array(mach_l), np.array(cl))
+        self.cd = CoeffTable(np.array(alpha_d), np.array(mach_d), np.array(cd))
+        self.cm = CoeffTable(np.array(alpha_m), np.array(mach_m), np.array(cm))
+
+        self.cl.checkdim('CL')
+        self.cd.checkdim('CD')
+        self.cm.checkdim('CM')
+
+        self._interpCL = RectBivariateSpline( self.cl.alpha, self.cl.mach, \
+                                            self.cl.val, kx=1, ky=1)
+        self._interpCD = RectBivariateSpline( self.cd.alpha, self.cd.mach, \
+                                            self.cd.val, kx=1, ky=1)
+        self._interpCM = RectBivariateSpline( self.cm.alpha, self.cm.mach, \
+                                            self.cm.val, kx=1, ky=1)
+
 
     def __repr__(self):
         if not self.isEmpty:
@@ -75,128 +99,98 @@ class C81:
         if not isinstance(airfoilname, str):
             raise TypeError('The input argument airfoilname is of incorrect data type')
 
-    def setValues(self, airfoilname, \
-                  alpha_l, mach_l, cl, \
-                  alpha_d, mach_d, cd,
-                  alpha_m, mach_m, cm):
-        """ Input airfoil data into C81 class variables as arguments """
-        self._checkdatatype(airfoilname,
-                            alpha_l=alpha_l, mach_l=mach_l, cl=cl,
-                            alpha_d=alpha_d, mach_d=mach_d, cd=cd,
-                            alpha_m=alpha_m, mach_m=mach_m, cm=cm)
-
-        self.isEmpty = False
-        self.airfoilname = airfoilname
-        self.cl = CoeffTable(np.array(alpha_l), np.array(mach_l), np.array(cl))
-        self.cd = CoeffTable(np.array(alpha_d), np.array(mach_d), np.array(cd))
-        self.cm = CoeffTable(np.array(alpha_m), np.array(mach_m), np.array(cm))
-
-        self.cl.checkdim('CL')
-        self.cd.checkdim('CD')
-        self.cm.checkdim('CM')
-
-    def readfile(self, filename):
-        """ Read C81 formatted data from text file """
-        f = open(filename, 'r')
-        header = f.readline().rstrip()
-        airfoilname = header[0:30]
-        nmach_l = int(header[30:32])
-        nalpha_l = int(header[32:34])
-        nmach_d = int(header[34:36])
-        nalpha_d = int(header[36:38])
-        nmach_m = int(header[38:40])
-        nalpha_m = int(header[40:42])
-
-        # LIFT
-        multilinedata = nmach_l >= 9
-        # Read mach values
-        mach_l = f.readline().rstrip()
-        if multilinedata:
-            mach_l = mach_l + f.readline().rstrip()
-        mach_l = list(map(float, mach_l.split()))
-        # Read alpha and coeff. values
-        alpha_l = []
-        cl = []
-        for i in range(nalpha_l):
-            line = f.readline().rstrip()
-            if multilinedata:
-                line = line + f.readline().rstrip()
-            line = list(map(float, line.split()))
-            alpha_l = alpha_l + [line[0]]
-            cl = cl + [line[1:]]
-
-        # DRAG
-        multilinedata = nmach_d >= 9
-        # Read mach values
-        mach_d = f.readline().rstrip()
-        if multilinedata:
-            mach_d = mach_d + f.readline().rstrip()
-        mach_d = list(map(float, mach_d.split()))
-        # Read alpha and coeff. values
-        alpha_d = []
-        cd = []
-        for i in range(nalpha_d):
-            line = f.readline().rstrip()
-            if multilinedata:
-                line = line + f.readline().rstrip()
-            line = list(map(float, line.split()))
-            alpha_d = alpha_d + [line[0]]
-            cd = cd + [line[1:]]
-
-        # MOMENT
-        multilinedata = nmach_m >= 9
-        # Read mach values
-        mach_m = f.readline().rstrip()
-        if multilinedata:
-            mach_m = mach_m + f.readline().rstrip()
-        mach_m = list(map(float, mach_m.split()))
-        # Read alpha and coeff. values
-        alpha_m = []
-        cm = []
-        for i in range(nalpha_m):
-            line = f.readline().rstrip()
-            if multilinedata:
-                line = line + f.readline().rstrip()
-            line = list(map(float, line.split()))
-            alpha_m = alpha_m + [line[0]]
-            cm = cm + [line[1:]]
-        f.close()
-
-        self.setValues(airfoilname, \
-                       alpha_l, mach_l, cl, \
-                       alpha_d, mach_d, cd, \
-                       alpha_m, mach_m, cm)
-
     def getCL(self, alphaQuery, machQuery):
         """ Returns bilinearly interpolated CL value """
-        alphaQuery = np.array(alphaQuery)
-        machQuery = np.array(machQuery)
+        return self._interpCL(alphaQuery, machQuery)[0][0]
 
-        if alphaQuery.shape != machQuery.shape:
-            raise ValueError('Shapes of alphaQuery and machQuery do not match')
+    def getCD(self, alphaQuery, machQuery):
+        """ Returns bilinearly interpolated CD value """
+        return self._interpCD(alphaQuery, machQuery)[0][0]
 
-        alphaQuery = np.clip(alphaQuery, \
-                             min(self.cl.alpha), \
-                             max(self.cl.alpha))
-        machQuery = np.clip(machQuery, \
-                             min(self.cl.mach), \
-                             max(self.cl.mach))
+    def getCM(self, alphaQuery, machQuery):
+        """ Returns bilinearly interpolated CM value """
+        return self._interpCM(alphaQuery, machQuery)[0][0]
 
-        print(self.cl.val.shape)
-        print(self.cl.alpha.size)
-        print(self.cl.mach.size)
-        CL = RectBivariateSpline(self.cl.alpha, self.cl.mach, self.cl.val, \
-                                  kx=1, ky=1)
+def load(fileObject):
+    """ Read C81 formatted data from text file """
+    header = fileObject.readline().rstrip()
+    airfoilname = header[0:30]
+    nmach_l = int(header[30:32])
+    nalpha_l = int(header[32:34])
+    nmach_d = int(header[34:36])
+    nalpha_d = int(header[36:38])
+    nmach_m = int(header[38:40])
+    nalpha_m = int(header[40:42])
 
-        return CL(alphaQuery, machQuery)
+    # LIFT
+    multilinedata = nmach_l >= 9
+    # Read mach values
+    mach_l = fileObject.readline().rstrip()
+    if multilinedata:
+        mach_l = mach_l + fileObject.readline().rstrip()
+    mach_l = list(map(float, mach_l.split()))
+    # Read alpha and coeff. values
+    alpha_l = []
+    cl = []
+    for i in range(nalpha_l):
+        line = fileObject.readline().rstrip()
+        if multilinedata:
+            line = line + fileObject.readline().rstrip()
+        line = list(map(float, line.split()))
+        alpha_l = alpha_l + [line[0]]
+        cl = cl + [line[1:]]
+
+    # DRAG
+    multilinedata = nmach_d >= 9
+    # Read mach values
+    mach_d = fileObject.readline().rstrip()
+    if multilinedata:
+        mach_d = mach_d + fileObject.readline().rstrip()
+    mach_d = list(map(float, mach_d.split()))
+    # Read alpha and coeff. values
+    alpha_d = []
+    cd = []
+    for i in range(nalpha_d):
+        line = f.readline().rstrip()
+        if multilinedata:
+            line = line + fileObject.readline().rstrip()
+        line = list(map(float, line.split()))
+        alpha_d = alpha_d + [line[0]]
+        cd = cd + [line[1:]]
+
+    # MOMENT
+    multilinedata = nmach_m >= 9
+    # Read mach values
+    mach_m = fileObject.readline().rstrip()
+    if multilinedata:
+        mach_m = mach_m + fileObject.readline().rstrip()
+    mach_m = list(map(float, mach_m.split()))
+    # Read alpha and coeff. values
+    alpha_m = []
+    cm = []
+    for i in range(nalpha_m):
+        line = fileObject.readline().rstrip()
+        if multilinedata:
+            line = line + fileObject.readline().rstrip()
+        line = list(map(float, line.split()))
+        alpha_m = alpha_m + [line[0]]
+        cm = cm + [line[1:]]
+
+    return C81(airfoilname, \
+                alpha_l, mach_l, cl, \
+                alpha_d, mach_d, cd, \
+                alpha_m, mach_m, cm)
 
 
-
-naca = C81()  # Initialize C81 object
 a = [0, 2, 8, 10]    # rows
 m = [0.0, 0.5, 1.0]  # columns
 c = [[0, 0.1, 0.2], [0.2, 0.3, 0.4], [0.8, 0.9, 1.0], [1.0, 1.1, 1.2]]
 
-naca.setValues('NACA 0012', a, m, c, a, m, c, a, m, c)
-# naca.readfile('sample1.C81')
-print(naca.getCL(8, 0.5))
+naca = C81('NACA 0012', a, m, c, a, m, c, a, m, c)
+print(naca.getCL(2, 2.0))
+# aQ = np.array([0, 2, 10, 8])
+# mQ = np.array([0, 0.5, 1, 0])
+
+# f = open('sample1.C81')
+# naca = load(f)
+# f.close()
