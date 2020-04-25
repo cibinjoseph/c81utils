@@ -6,7 +6,7 @@ upload_test:
 	twine upload --repository testpypi dist/*
 
 upload:
-	twine upload --repository pypi dist/*
+	twine upload dist/*
 
 clean:
 	rm -rf build c81utils.egg-info __pycache__ dist
