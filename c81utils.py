@@ -54,13 +54,7 @@ class C81:
         self.CD.checkdim('CD')
         self.CM.checkdim('CM')
 
-        self._interpCL = RectBivariateSpline( self.CL.alpha, self.CL.mach, \
-                                            self.CL.val, kx=1, ky=1)
-        self._interpCD = RectBivariateSpline( self.CD.alpha, self.CD.mach, \
-                                            self.CD.val, kx=1, ky=1)
-        self._interpCM = RectBivariateSpline( self.CM.alpha, self.CM.mach, \
-                                            self.CM.val, kx=1, ky=1)
-
+        refreshInterpolation()
 
     def __repr__(self):
         strout = ('C81 dataset ' +
@@ -96,6 +90,16 @@ class C81:
 
         if not isinstance(airfoilname, str):
             raise TypeError('The input argument airfoilname is of incorrect data type')
+
+    def refreshInterpolation(self):
+        """ Refreshes the interpolating functions. """
+        """ May be used when data has been changed manually. """
+        self._interpCL = RectBivariateSpline( self.CL.alpha, self.CL.mach, \
+                                            self.CL.val, kx=1, ky=1)
+        self._interpCD = RectBivariateSpline( self.CD.alpha, self.CD.mach, \
+                                            self.CD.val, kx=1, ky=1)
+        self._interpCM = RectBivariateSpline( self.CM.alpha, self.CM.mach, \
+                                            self.CM.val, kx=1, ky=1)
 
     def getCL(self, alphaQuery, machQuery):
         """ Returns bilinearly interpolated CL value """
