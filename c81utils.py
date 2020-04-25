@@ -2,7 +2,7 @@ import numpy as np
 from scipy.interpolate import RectBivariateSpline
 
 
-__version__ = '1.0.1'
+__version__ = '1.0.2'
 
 class CoeffTable:
     """ CoeffTable class for aerodynamic coefficients """
