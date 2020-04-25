@@ -9,7 +9,7 @@ setup(
     long_description='\n'.join([
         open('README.rst').read(),
         open('CHANGES.rst').read()
-    ])
+    ]),
     keywords='c81',
     author='Cibin Joseph',
     author_email='cibinjoseph92@gmail.com',
