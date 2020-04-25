@@ -1,6 +1,6 @@
 from setuptools import setup
 
-version = '0.1'
+version = '1.0'
 
 setup(
     name='c81utils',
@@ -8,13 +8,13 @@ setup(
     description='Library for working with C81 airfoil data',
     long_description='\n'.join([
         open('README.rst').read(),
-        open('CHANGES.rst').read()
+        open('CHANGES.rst').read(),
     ]),
+    long_description_content_type='text/x-rst',
     keywords='c81',
     author='Cibin Joseph',
     author_email='cibinjoseph92@gmail.com',
     url='http://pypi.python.org/pypi/c81utils',
-    license='BSD',
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Science/Research',
