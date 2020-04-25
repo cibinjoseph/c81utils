@@ -33,8 +33,6 @@ class CoeffTable:
 class C81:
     """ C81 class for c81 formatted airfoil tables """
 
-    isEmpty = True
-
     def __init__(self, airfoilname, \
                  alpha_L, mach_l, CL, \
                  alpha_D, mach_d, CD, \
@@ -45,7 +43,6 @@ class C81:
                             alpha_D=alpha_D, mach_d=mach_d, CD=CD,
                             alpha_M=alpha_M, mach_m=mach_m, CM=CM)
 
-        self.isEmpty = False
         self.airfoilname = airfoilname
         self.CL = CoeffTable(np.array(alpha_L), np.array(mach_l), np.array(CL))
         self.CD = CoeffTable(np.array(alpha_D), np.array(mach_d), np.array(CD))
@@ -64,14 +61,11 @@ class C81:
 
 
     def __repr__(self):
-        if not self.isEmpty:
-            strout = ('C81 dataset ' +
-                      '\n  Airfoil name : ' + self.airfoilname +
-                      '\n  CL data size: ' + str(np.shape(self.CL.val)[0]) + ' by ' + str(np.shape(self.CL.val)[1]) +
-                      '\n  CD data size: ' + str(np.shape(self.CD.val)[0]) + ' by ' + str(np.shape(self.CD.val)[1]) +
-                      '\n  CM data size: ' + str(np.shape(self.CM.val)[0]) + ' by ' + str(np.shape(self.CM.val)[1]))
-        else:
-            strout = 'Uninitialized C81 class'
+        strout = ('C81 dataset ' +
+                  '\n  Airfoil name : ' + self.airfoilname +
+                  '\n  CL data size: ' + str(np.shape(self.CL.val)[0]) + ' by ' + str(np.shape(self.CL.val)[1]) +
+                  '\n  CD data size: ' + str(np.shape(self.CD.val)[0]) + ' by ' + str(np.shape(self.CD.val)[1]) +
+                  '\n  CM data size: ' + str(np.shape(self.CM.val)[0]) + ' by ' + str(np.shape(self.CM.val)[1]))
         return strout
 
     def __eq__(self, other):
