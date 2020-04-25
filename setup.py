@@ -7,9 +7,8 @@ setup(
     version=version,
     description='Library for working with C81 airfoil data',
     long_description='\n'.join([
-        open('README.rst').read(),
-        open('CHANGES.rst').read(),
-    ]),
+        open('README.rst', 'r').read(),
+        open('CHANGES.rst', 'r').read()]),
     long_description_content_type='text/x-rst',
     keywords='c81',
     author='Cibin Joseph',
@@ -25,6 +24,7 @@ setup(
         'Topic :: Scientific/Engineering'
     ],
     python_requires='>=3',
+    license='GPL3',
     include_package_data=True,
     zip_safe=True,
     install_requires=['numpy', 'scipy'],
