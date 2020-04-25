@@ -1,11 +1,14 @@
 all:
+	make package:
+
+package:
 	python3 setup.py sdist bdist_wheel
 	twine check dist/*
 
 upload_test:
 	twine upload --repository testpypi dist/*
 
-upload:
+upload: dist/
 	twine upload dist/*
 
 test:
