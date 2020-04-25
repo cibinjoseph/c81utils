@@ -4,3 +4,6 @@ tests/__pycache__/
 *.pyc
 tests/*.so
 trial.py
+build/
+dist/
+c81utils.egg-info/
