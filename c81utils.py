@@ -54,7 +54,7 @@ class C81:
         self.CD.checkdim('CD')
         self.CM.checkdim('CM')
 
-        refreshInterpolation()
+        self.refreshInterpolation()
 
     def __repr__(self):
         strout = ('C81 dataset ' +
