@@ -8,5 +8,8 @@ upload_test:
 upload:
 	twine upload dist/*
 
+test:
+	python3 -m unittest discover
+
 clean:
 	rm -rf build c81utils.egg-info __pycache__ dist
