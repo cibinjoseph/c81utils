@@ -1,3 +1,7 @@
+.. image:: https://img.shields.io/pypi/v/c81utils.svg
+   :target: https://pypi.org/project/c81utils/
+   :alt: c81utils on PyPI
+
 .. image:: https://travis-ci.com/cibinjoseph/c81utils.svg?token=FMmn3XQeRECGNsy6mT6B&branch=master
    :target: https://travis-ci.com/cibinjoseph/c81utils
 
