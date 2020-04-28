@@ -113,8 +113,70 @@ class C81:
         """ Returns bilinearly interpolated CM value """
         return self._interpCM(alphaQuery, machQuery)[0][0]
 
+def dump(c81Data, fileObject):
+    """ Write airfoil tables to C81 formatted file """
+    lengths = ''
+    lengths = lengths + '{:02d}'.format(c81Data.CL.mach.size)
+    lengths = lengths + '{:02d}'.format(c81Data.CL.alpha.size)
+    lengths = lengths + '{:02d}'.format(c81Data.CD.mach.size)
+    lengths = lengths + '{:02d}'.format(c81Data.CD.alpha.size)
+    lengths = lengths + '{:02d}'.format(c81Data.CM.mach.size)
+    lengths = lengths + '{:02d}'.format(c81Data.CM.alpha.size)
+
+    # Header
+    line = '{:30.30}{:12.12}'.format(c81Data.airfoilname, lengths)
+    fileObject.write(line + '\n')
+
+    spaces7 = '       '
+
+    def wrapline(lineString, chars=70):
+        if len(lineString) > chars:
+            return lineString[:chars] + '\n' + spaces7 + lineString[chars:]
+        else:
+            return lineString
+
+    # Lift section
+    line = spaces7
+    for val in c81Data.CL.mach:
+        line += '{:7.3f}'.format(val)
+    line = wrapline(line)
+    fileObject.write(line + '\n')
+    for indx, val in enumerate(c81Data.CL.alpha):
+        line = '{:7.2f}'.format(val)
+        for CLval in c81Data.CL.val[indx]:
+            line += '{:7.3f}'.format(CLval)
+        line = wrapline(line)
+        fileObject.write(line + '\n')
+
+    # Drag section
+    line = spaces7
+    for val in c81Data.CD.mach:
+        line += '{:7.3f}'.format(val)
+    line = wrapline(line)
+    fileObject.write(line + '\n')
+    for indx, val in enumerate(c81Data.CD.alpha):
+        line = '{:7.2f}'.format(val)
+        for CDval in c81Data.CD.val[indx]:
+            line += '{:7.3f}'.format(CDval)
+        line = wrapline(line)
+        fileObject.write(line + '\n')
+
+    # Moment section
+    line = spaces7
+    for val in c81Data.CM.mach:
+        line += '{:7.3f}'.format(val)
+    line = wrapline(line)
+    fileObject.write(line + '\n')
+    for indx, val in enumerate(c81Data.CM.alpha):
+        line = '{:7.2f}'.format(val)
+        for CMval in c81Data.CM.val[indx]:
+            line += '{:7.3f}'.format(CMval)
+        line = wrapline(line)
+        fileObject.write(line + '\n')
+
+
 def load(fileObject):
-    """ Read C81 formatted data from text file """
+    """ Read airfoil tables from C81 formatted file """
     header = fileObject.readline().rstrip()
     airfoilname = header[0:30]
     nmach_l = int(header[30:32])
