@@ -2,6 +2,7 @@ import unittest
 import c81utils
 import numpy as np
 import csv
+import filecmp, os
 
 testdir = 'tests/'
 
@@ -192,6 +193,24 @@ class C81InputTestGood(unittest.TestCase):
             self.assertAlmostEqual(val, correct[indx], places=12)
         for indx, val in enumerate(CM):
             self.assertAlmostEqual(val, correct[indx], places=12)
+
+class C81WriteTest(unittest.TestCase):
+
+    def setUp(self):
+        with open('tests/sample2.C81', 'r') as fh:
+            self.airfoil = c81utils.load(fh)
+
+    def test_dump(self):
+        with open('sample2_dummy.C81', 'w') as fh:
+            c81utils.dump(self.airfoil, fh)
+
+        self.assertTrue(filecmp.cmp('tests/sample2.C81', \
+                                    'sample2_dummy.C81', \
+                                    'C81 file write test failed'))
+
+    def tearDown(self):
+        if os.path.exists('sample2_dummy.C81'):
+            os.remove('sample2_dummy.C81')
 
 
 if __name__ == '__main__':
