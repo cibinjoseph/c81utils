@@ -91,9 +91,28 @@ class C81:
         if not isinstance(airfoilname, str):
             raise TypeError('The input argument airfoilname is of incorrect data type')
 
+    @staticmethod
+    def _isIncreasing(arr):
+        """ Checks if monotonically increasing array """
+        return np.all(np.diff(arr) > 0)
+
     def refreshInterpolation(self):
         """ Refreshes the interpolating functions. """
         """ May be used when data has been changed manually. """
+        # Ensure alpha and mach are strictly increasing
+        if not self._isIncreasing(self.CL.alpha):
+            raise ValueError('alpha CL should be strictly increasing')
+        if not self._isIncreasing(self.CL.mach):
+            raise ValueError('mach CL should be strictly increasing')
+        if not self._isIncreasing(self.CD.alpha):
+            raise ValueError('alpha CL should be strictly increasing')
+        if not self._isIncreasing(self.CD.mach):
+            raise ValueError('mach CL should be strictly increasing')
+        if not self._isIncreasing(self.CM.alpha):
+            raise ValueError('alpha CL should be strictly increasing')
+        if not self._isIncreasing(self.CM.mach):
+            raise ValueError('mach CL should be strictly increasing')
+
         self._interpCL = RectBivariateSpline( self.CL.alpha, self.CL.mach, \
                                             self.CL.val, kx=1, ky=1)
         self._interpCD = RectBivariateSpline( self.CD.alpha, self.CD.mach, \
