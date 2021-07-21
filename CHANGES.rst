@@ -3,7 +3,7 @@
 
 * Initial release.
 
-1.0.1 (2021-07-21)
+1.0.4 (2021-07-21)
 --------------------
 
 * Ensure mach and alpha arrays are strictly increasing.
