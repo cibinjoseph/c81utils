@@ -2,7 +2,7 @@ import numpy as np
 from scipy.interpolate import RectBivariateSpline
 
 
-__version__ = '1.0.4'
+__version__ = '1.0.5'
 
 class CoeffTable:
     """ CoeffTable class for aerodynamic coefficients """
@@ -24,6 +24,11 @@ class CoeffTable:
             raise ValueError('Wrong dimensions for ' + coeffname + ' alpha')
         if len(self.val.shape) != 2:
             raise ValueError('Wrong dimensions for ' + coeffname + ' coefficient matrix')
+
+        if len(self.mach) < 2:
+            raise ValueError('Atleast two values required in mach array')
+        if len(self.alpha) < 2:
+            raise ValueError('Atleast two values required in alpha array')
 
         cols = self.mach.shape[0]
         rows = self.alpha.shape[0]
