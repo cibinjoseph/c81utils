@@ -110,13 +110,13 @@ class C81:
         if not self._isIncreasing(self.CL.mach):
             raise ValueError('mach CL should be strictly increasing')
         if not self._isIncreasing(self.CD.alpha):
-            raise ValueError('alpha CL should be strictly increasing')
+            raise ValueError('alpha CD should be strictly increasing')
         if not self._isIncreasing(self.CD.mach):
-            raise ValueError('mach CL should be strictly increasing')
+            raise ValueError('mach CD should be strictly increasing')
         if not self._isIncreasing(self.CM.alpha):
-            raise ValueError('alpha CL should be strictly increasing')
+            raise ValueError('alpha CM should be strictly increasing')
         if not self._isIncreasing(self.CM.mach):
-            raise ValueError('mach CL should be strictly increasing')
+            raise ValueError('mach CM should be strictly increasing')
 
         self._interpCL = RectBivariateSpline( self.CL.alpha, self.CL.mach, \
                                             self.CL.val, kx=1, ky=1)
