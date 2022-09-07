@@ -211,7 +211,7 @@ def load(fileObject):
     nalpha_M = int(header[40:42])
 
     # LIFT
-    multilinedata = nmach_l >= 9
+    multilinedata = nmach_l > 9
     # Read mach values
     mach_l = fileObject.readline().rstrip()
     if multilinedata:
@@ -229,7 +229,7 @@ def load(fileObject):
         CL = CL + [line[1:]]
 
     # DRAG
-    multilinedata = nmach_d >= 9
+    multilinedata = nmach_d > 9
     # Read mach values
     mach_d = fileObject.readline().rstrip()
     if multilinedata:
@@ -247,7 +247,7 @@ def load(fileObject):
         CD = CD + [line[1:]]
 
     # MOMENT
-    multilinedata = nmach_m >= 9
+    multilinedata = nmach_m > 9
     # Read mach values
     mach_m = fileObject.readline().rstrip()
     if multilinedata:
