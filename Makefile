@@ -1,3 +1,6 @@
+# This Makefile helps with uploading the script to pip repo
+# Update the version number and run make command
+
 all:
 	make dist
 	@echo "Now run 'make upload' to upload"
