@@ -2,8 +2,9 @@
    :target: https://pypi.org/project/c81utils/
    :alt: c81utils on PyPI
 
-.. image:: https://travis-ci.com/cibinjoseph/c81utils.svg?token=FMmn3XQeRECGNsy6mT6B&branch=master
-   :target: https://travis-ci.com/cibinjoseph/c81utils
+.. image:: https://github.com/cibinjoseph/c81utils/actions/workflows/python-app.yml/badge.svg
+   :target: https://github.com/cibinjoseph/c81utils/actions/workflows/python-app.yml
+   :alt: Tests
 
 c81utils
 =========
