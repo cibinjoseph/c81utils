@@ -6,4 +6,6 @@ tests/*.so
 trial.py
 build/
 dist/
-c81utils.egg-info/
+*.egg-info/
+.venv/
+.pytest_cache/

@@ -1,1 +1,5 @@
-include *.rst *.py
+include LICENSE README.rst CHANGES.rst requirements.txt
+include test_c81utils.py
+recursive-include tests *
+recursive-include samples *
+global-exclude __pycache__ *.py[cod]

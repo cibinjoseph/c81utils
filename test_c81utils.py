@@ -2,9 +2,9 @@ import unittest
 import c81utils
 import numpy as np
 import csv
-import filecmp, os
+import filecmp, os, shutil, tempfile
 
-testdir = 'tests/'
+testdir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'tests') + os.sep
 
 class CoeffTableTestGood(unittest.TestCase):
 
@@ -197,20 +197,21 @@ class C81InputTestGood(unittest.TestCase):
 class C81WriteTest(unittest.TestCase):
 
     def setUp(self):
-        with open('tests/sample2.C81', 'r') as fh:
+        with open(testdir + 'sample2.C81', 'r') as fh:
             self.airfoil = c81utils.load(fh)
+        self.tmpdir = tempfile.mkdtemp()
+        self.dummy = os.path.join(self.tmpdir, 'sample2_dummy.C81')
 
     def test_dump(self):
-        with open('sample2_dummy.C81', 'w') as fh:
+        with open(self.dummy, 'w') as fh:
             c81utils.dump(self.airfoil, fh)
 
-        self.assertTrue(filecmp.cmp('tests/sample2.C81', \
-                                    'sample2_dummy.C81', \
+        self.assertTrue(filecmp.cmp(testdir + 'sample2.C81', \
+                                    self.dummy, \
                                     'C81 file write test failed'))
 
     def tearDown(self):
-        if os.path.exists('sample2_dummy.C81'):
-            os.remove('sample2_dummy.C81')
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
 
 
 if __name__ == '__main__':

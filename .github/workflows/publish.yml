@@ -1,0 +1,58 @@
+# Publishes to PyPI when a GitHub Release is published.
+# The tag must be "v" plus __version__ in c81utils/__init__.py (v1.1.0 for 1.1.0).
+
+name: Publish to PyPI
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    permissions:
+      contents: read
+    uses: ./.github/workflows/python-app.yml
+
+  publish:
+    needs: test
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/c81utils/
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.13"
+    - name: Check tag matches package version
+      run: |
+        python - <<'PY'
+        import ast, os, pathlib, sys
+        path = pathlib.Path("c81utils/__init__.py")
+        version = None
+        for node in ast.parse(path.read_text()).body:
+            if isinstance(node, ast.Assign):
+                for target in node.targets:
+                    if isinstance(target, ast.Name) and target.id == "__version__":
+                        version = ast.literal_eval(node.value)
+        ref = os.environ["GITHUB_REF_NAME"]
+        if not ref.startswith("v") or ref[1:] != version:
+            sys.exit(
+                f"release tag {ref!r} does not match __version__ {version!r}; "
+                "expected tag v" + str(version)
+            )
+        print(f"{ref} matches __version__ {version}")
+        PY
+    - name: Build package
+      run: |
+        python -m pip install --upgrade pip build
+        python -m build
+    - name: Publish to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
