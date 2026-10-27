@@ -7,11 +7,93 @@
 
 c81utils
 =========
-A Python module for working with C81 airfoil tables.  
+Read, write, interpolate, convert and plot C81 airfoil tables.
+Includes a ``c81-convert`` command for converting between C81 and CSV.
 
-Usage
--------
-*c81utils* implements a ``C81`` class that handles the C81 data for each airfoil.  
+Installation
+-------------
+
+.. code-block:: bash
+
+    pip install c81utils            # core
+    pip install "c81utils[plot]"    # + Matplotlib, for plotting
+
+Quick start
+------------
+
+.. code-block:: python
+
+    import c81utils as c81
+
+    # CSV -> C81 file (writes NACA0012.c81 next to the CSV)
+    c81.csv_to_c81("NACA0012.csv")
+
+    # Load the C81 file and interpolate (bilinear in alpha [deg] and Mach)
+    with open("NACA0012.c81") as f:
+        airfoil = c81.load(f)
+
+    cl = airfoil.getCL(5.0, 0.3)
+    cd = airfoil.getCD(5.0, 0.3)
+    cm = airfoil.getCM(5.0, 0.3)
+
+    # No C81 file needed: load the CSV directly
+    airfoil = c81.load_csv("NACA0012.csv")
+    cl = airfoil.getCL(5.0, 0.3)
+
+    # C81 -> CSV, to inspect or edit the tables in a spreadsheet
+    c81.c81_to_csv("NACA0012.c81")
+
+    # Write a loaded airfoil as CSV; paths or open text files both work
+    c81.dump_csv(airfoil, "edited.csv")
+
+    # Plot (needs c81utils[plot]); returns (fig, axes), does not call show()
+    fig, axes = c81.plot(airfoil)
+    fig.savefig("NACA0012.png")
+
+Command line
+-------------
+
+.. code-block:: bash
+
+    c81-convert airfoil.csv                 # -> airfoil.c81
+    c81-convert airfoil.c81                 # -> airfoil.csv
+    c81-convert airfoil.csv -o result.c81   # explicit output (single input only)
+    c81-convert a.csv b.csv c.c81           # several files at once
+    c81-convert --plot airfoil.c81          # plot CL, CD, CM vs alpha
+
+The direction is chosen from the extension (case-insensitive). Output files
+are printed; errors go to stderr with exit status 1 (2 for bad usage).
+An input file is never overwritten.
+
+CSV format
+-----------
+
+.. code-block:: text
+
+    # CL: first row = Mach numbers (first cell is a placeholder)
+    0,   0.0,  0.3,  0.6
+    -10, -0.8, -0.7, -0.6
+    0,   0.0,  0.0,  0.0
+    10,  0.8,  0.7,  0.6
+
+    # CD (optional), after a blank line
+    0,   0.0,  0.6
+    -10, 0.02, 0.03
+    10,  0.02, 0.03
+
+* Up to three tables, in the order CL, CD, CM, separated by blank lines.
+* First column is alpha in degrees; commas or whitespace; ``#`` starts a comment.
+* A missing CD or CM table becomes zeros on the CL alpha and Mach grids.
+* Each table may have its own grids (different sizes are fine).
+* Grids must be strictly increasing (they are never sorted or resampled).
+  NaN/inf, ragged rows, non-numeric text and more than three tables are errors.
+
+Note: C81 files store coefficients with 3 decimals, so a CSV -> C81 -> CSV
+round trip rounds the data. CSV files keep full precision.
+
+C81 class
+----------
+*c81utils* implements a ``C81`` class that handles the C81 data for each airfoil.
 A few example usages are shown below:
 
 .. code-block:: python
@@ -48,16 +130,11 @@ A few example usages are shown below:
                              alpha, mach, CD, \
                              alpha, mach, CM)
 
-
-Installation
--------------
-*c81utils* is written in Python 3. Use pip to install.
-
-.. code-block:: bash
-
-    pip3 install c81utils
+    # 'dump' writes a C81 formatted text file
+    with open("myAirfoil.C81", "w") as f:
+      c81utils.dump(myAirfoil, f)
 
 
-Author
--------
-`Cibin Joseph <https://github.com/cibinjoseph>`_
+License and author
+-------------------
+GPLv3. By `Cibin Joseph <https://github.com/cibinjoseph>`_

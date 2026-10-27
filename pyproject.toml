@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "c81utils"
+dynamic = ["version", "readme"]
+description = "Library and command-line tools for working with C81 airfoil data"
+authors = [{ name = "Cibin Joseph", email = "cibinjoseph92@gmail.com" }]
+license = "GPL-3.0-or-later"
+license-files = ["LICENSE"]
+keywords = ["c81", "airfoil", "aerodynamics", "csv"]
+requires-python = ">=3.9"
+dependencies = [
+    "numpy>=1.16.4",
+    "scipy>=1.4.1",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering",
+]
+
+[project.optional-dependencies]
+plot = ["matplotlib"]
+test = ["pytest"]
+
+[project.urls]
+Homepage = "https://github.com/cibinjoseph/c81utils"
+PyPI = "https://pypi.org/project/c81utils/"
+Changelog = "https://github.com/cibinjoseph/c81utils/blob/master/CHANGES.rst"
+
+[project.scripts]
+c81-convert = "c81utils.cli:main"
+
+[tool.setuptools]
+packages = ["c81utils"]
+
+[tool.setuptools.dynamic]
+# Read statically from the source: NumPy/SciPy are not imported at build time.
+version = { attr = "c81utils.__version__" }
+readme = { file = ["README.rst", "CHANGES.rst"], content-type = "text/x-rst" }
+
+[tool.pytest.ini_options]
+testpaths = ["tests", "test_c81utils.py"]

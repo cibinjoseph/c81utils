@@ -1,12 +1,12 @@
-# This Makefile helps with uploading the script to pip repo
-# Update the version number and run make command
+# Helpers for building and uploading the package.
+# Update the version number in c81utils/__init__.py, then run make.
 
 all:
 	make dist
 	@echo "Now run 'make upload' to upload"
 
 dist:
-	python3 setup.py sdist bdist_wheel
+	python3 -m build
 	twine check dist/*
 
 upload_test:
@@ -16,7 +16,7 @@ upload: dist/
 	twine upload dist/*
 
 test:
-	python3 -m unittest discover
+	python3 -m pytest
 
 clean:
-	rm -rf build c81utils.egg-info __pycache__ dist
+	rm -rf build c81utils.egg-info __pycache__ dist .pytest_cache
